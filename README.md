@@ -40,7 +40,7 @@ Building & Manual Install
 * cmake
 * a build tool chain (most distros have one preinstalled, or available in a build-essentials package)
 
-#### If you would like to compile BLT4L with custom asset-loading functionailty, which allows you to use certain custom masks and certain Custom HUDS, then you also require these extra prerequisites:
+#### If you would like to compile BLT4L with custom asset-loading functionailty, which allows you to use certain custom masks and certain Custom HUDS that load textures and (possibly) modesl from outside the game, then you also require these extra prerequisites:
 
 * libc++dev
 * clang (3.8+)
@@ -60,8 +60,13 @@ $ make
 Note: If you opted to not install the extra prerequisites for custom asset-loading, then you can remove the variable ```-DUSE_LIBCXX=1``` from the cmake command.
 
 You should find the hook in your build folder, named `libblt_loader.so`.
-You will need to set `LD_PRELOAD` for the PAYDAY2 process to find the
-loader.
+You will need to set the `LD_PRELOAD` path for the PAYDAY2 process to find the
+blt4l loader. Paste the command below into Steams' Launch options for PAYDAY 2:
+
+```
+  env LD_PRELOAD="$LD_PRELOAD ./libblt_loader.so" %command% -skip_intro
+  
+```
 
 Next, you will need to copy a LUA mod base to your PAYDAY 2 folder (or whatever working directory you intend to run PAYDAY 2 in).
 There is a symlink to the BLT LUA mod base (from the BLT4WIN submodule) under `lua/mods`. 
@@ -93,7 +98,7 @@ prepending `BLT_CRASH=CONTINUE` to the game launch arguments in Steam.
 
 ##### Lua API
 
-BLT4L contains some additional Lua functions not present in windows PAYDAY.
+BLT4L contains some additional Lua functions not present in the windows version of PAYDAY 2.
 
 The first set of these are in the `vm` table, and are functions copied from Lua 5.1
 that are missing or have different behaviour in PAYDAY:
@@ -115,7 +120,8 @@ functions. Mods should use the Lua `io` table wherever possible.
 Many of the `DB` functions are missing - in particular, `DB:create_entry` is missing, which is
 how mods usually load custom assets (models, textures, etc) into the game. Work is (slowly) being done
 to reverse-engineer and reimplement this by @RomanHargrave and @ZNixian, however due to the difficulty of
-this task this will probably take a long time. As a result of this, custom heist/weapon/mask mods will
-not work (anything that goes into `mod_overrides` will still work, however).
+this task, this will probably take a long time. 
+
+As a result of this, Custom Heists, Weapons and Masks do not work, however, anything that uses in-game assets, which goes into `mod_overrides`, will still work. Custom HUDs and Custom Videos do work when BLT4L is compiled with asset-loading functionality.
 
 If you find any other Lua functions that are missing in BLT4L, please open an issue.
